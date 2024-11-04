@@ -1,0 +1,23 @@
+def fft_render(name):
+    if name[-3:]=='txt':
+        print("need manual intervention")
+        f=float(input('what is the acquiring frquency ?'))
+        with open(name, 'rb') as file_to_decode:
+            binary_file_data = file_to_decode.read()
+            data = np.frombuffer(base64.b64decode(binary_file_data), np.int16)
+        T=np.linspace(0,(len(data)-1)*1/f,len(data))
+        fft_result = np.fft.fft(data)  # mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
+        fft_freq = np.fft.fftfreq(len(T), 1/f)
+        plt.plot(fft_freq, np.abs(fft_result) / len(T))
+        plt.show()
+        return (fft_result, fft_freq)
+    elif name[-3:]=='csv':
+        signal = pd.read_csv(name,sep=',')
+        T=signal['Time(s)']
+        V=signal['Volt(V)']
+        t=T[1]
+        fft_result = np.fft.fft(V)  # mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
+        fft_freq = np.fft.fftfreq(len(T),t)
+        plt.plot(fft_freq,np.abs(fft_result)/len(T))
+        plt.show()
+        return(fft_result,fft_freq)
