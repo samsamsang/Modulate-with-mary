@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+signal = pd.read_csv('data_03.csv',sep=',') # si header = 2 on a le titre des colonnes sinon =3  on a seulement la première ligne # smipfooter does not work with 'c' engine : use of nrows but not useable for each file
+#print(signal)
+# we create vectors
+T=signal['Time(s)']
+V=signal['Volt(V)']
+print(type(0.000006))
+#let's calculate fourier transform
+fft_result=np.fft.fft(V)#mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
+fft_freq=np.fft.fftfreq(320000,0.000006)
+##On définit au préalable les trois portes pour chacunes de nos fréquence porteuse
+p1=np.abs(fft_freq)<=19500
+p2= (np.abs(fft_freq)>=19500) & (np.abs(fft_freq)<=32500)
+p3=np.abs(fft_freq)>32500
+##nous appliquons ces portes en fréquence à notre transformée du signal pour obtenir nos trois signaux
+fft_result1=p1*fft_result
+fft_result2=p2*fft_result
+fft_result3=p3*fft_result
+## Nous les détransformons afin d'effectuer une modulation sur les signaux séparés
+detrans1=np.fft.fft(fft_result1)
+detrans2=np.fft.fft(fft_result2)
+detrans3=np.fft.fft(fft_result3)
+mod1=detrans1*np.sin(2*np.pi*T*12500)
+mod2=detrans2*np.sin(2*np.pi*T*25000)
+mod3=detrans3*np.sin(2*np.pi*T*37500)
+## Enfin nous repassons sur leurs spectres en fréquence afin d'appliquer une dernière porte et isoler le signal final
+modfin1=np.fft.fft(mod1)
+modfin2=np.fft.fft(mod2)
+modfin3=np.fft.fft(mod3)
+j=np.abs(fft_freq)<12000
+traite1=modfin1*j
+traite2=modfin2*j
+traite3=modfin3*j
+##Nous obtenons finalement chacun des signaux isolés
+fin1=np.fft.fft(traite1)
+fin2=np.fft.fft(traite2)
+fin3=np.fft.fft(traite3)
+plt.plot(T,np.real(fin3))
+plt.show()
