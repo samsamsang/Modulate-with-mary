@@ -6,27 +6,20 @@ with open('data_02.txt','rb') as file_to_decode:
     data=np.frombuffer(base64.b64decode(binary_file_data),np.int16)
 print(data)
 print(len(data))
-time_of_death=np.linspace(0,7.55,len(data))
-print(len(time_of_death))
-plt.plot(time_of_death,data)
-plt.show()
-data_rendu=np.sin(2*np.pi*6000*time_of_death)*data
-# import scipy.io as si
-#
-# f=si.wavfile.read('data_02.txt')
+T=np.linspace(0,7.55,len(data))
+plt.subplot(2,2,1)
+plt.plot(T,data)
+data_rendu=np.sin(2*np.pi*6000*T)*data
 fft_result=np.fft.fft(data_rendu)
 fft_freq=np.fft.fftfreq(len(data),1/24000)
 fft_mag=np.abs(fft_result) / len(data)
+plt.subplot(2,2,2)
 plt.plot(fft_freq,fft_mag)
-plt.show()
-def fft_result_rendu(result,freq):
-    for i in range(len(result)):
-        if np.abs(freq[i])>5000:
-            result[i]=0
-    return(result)
-final=fft_result_rendu(fft_result,fft_freq)
+porte=np.abs(freq)<=5000
+final=fft_result*porte
+plt.subplot(2,2,3)
 plt.plot(fft_freq,np.abs(final)/len(data))
-plt.show()
-joie=np.fft.fft(final)
-plt.plot(time_of_death,np.abs(joie))
+signal=np.fft.ifft(final)
+plt.subplot(2,2,4)
+plt.plot(T,np.abs(signal))
 plt.show()
