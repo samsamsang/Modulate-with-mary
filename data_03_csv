@@ -7,9 +7,14 @@ signal = pd.read_csv('data_03.csv',sep=',') # si header = 2 on a le titre des co
 # we create vectors
 T=signal['Time(s)']
 V=signal['Volt(V)']
+plt.subplot(1,1,1)
+plt.plot(T,V) 
+plt.xlabel('temps')
+plt.ylabel('volt')
+plt.show()
 print(type(0.000006))
 #let's calculate fourier transform
-fft_result=np.fft.fft(V)#mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
+fft_result=np.fft.fft(V) #mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
 fft_freq=np.fft.fftfreq(320000,0.000006)
 ##On définit au préalable les trois portes pour chacunes de nos fréquence porteuse
 p1=np.abs(fft_freq)<=19500
@@ -19,24 +24,48 @@ p3=np.abs(fft_freq)>32500
 fft_result1=p1*fft_result
 fft_result2=p2*fft_result
 fft_result3=p3*fft_result
+plt.subplot(1,3,2) 
+plt.plot(fft_freq, fft_result1)
+plt.plot(fft_freq, fft_result2)
+plt.plot(fft_freq, fft_result3)
+plt.show()
 ## Nous les détransformons afin d'effectuer une modulation sur les signaux séparés
 detrans1=np.fft.ifft(fft_result1)
 detrans2=np.fft.ifft(fft_result2)
 detrans3=np.fft.ifft(fft_result3)
+plt.subplot(1,3,3) 
+plt.plot(fft_freq, detrans1)
+plt.plot(fft_freq, detrans2)
+plt.plot(fft_freq, detrans3)
+plt.show()
 mod1=detrans1*np.sin(2*np.pi*T*12500)
 mod2=detrans2*np.sin(2*np.pi*T*25000)
 mod3=detrans3*np.sin(2*np.pi*T*37500)
+plt.subplot(1,3,4) 
+plt.plot(fft_freq, mod1)
+plt.plot(fft_freq, mod2)
+plt.plot(fft_freq, mod3)
+plt.show()
 ## Enfin nous repassons sur leurs spectres en fréquence afin d'appliquer une dernière porte et isoler le signal final
 modfin1=np.fft.fft(mod1)
 modfin2=np.fft.fft(mod2)
 modfin3=np.fft.fft(mod3)
+
 j=np.abs(fft_freq)<12000
 traite1=modfin1*j
 traite2=modfin2*j
 traite3=modfin3*j
+plt.subplot(1,3,5) 
+plt.plot(fft_freq,traite1)
+plt.plot(fft_freq, traite2)
+plt.plot(fft_freq, traite3)
+plt.show()
 ##Nous obtenons finalement chacun des signaux isolés
 fin1=np.fft.ifft(traite1)
 fin2=np.fft.ifft(traite2)
 fin3=np.fft.ifft(traite3)
+plt.subplot(1,3,6)
+plt.plot(T,np.real(fin1)/np.max(np.real(fin1)))
+plt.plot(T,np.real(fin2)/np.max(np.real(fin2)))
 plt.plot(T,np.real(fin3)/np.max(np.real(fin3)))
 plt.show()
