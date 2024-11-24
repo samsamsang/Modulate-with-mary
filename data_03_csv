@@ -38,5 +38,5 @@ traite3=modfin3*j
 fin1=np.fft.ifft(traite1)
 fin2=np.fft.ifft(traite2)
 fin3=np.fft.ifft(traite3)
-plt.plot(T,np.real(fin3)/np.range(fin3))
+plt.plot(T,np.real(fin3)/len(fin3))
 plt.show()
