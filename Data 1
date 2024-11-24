@@ -1,0 +1,45 @@
+
+# This is a sample Python script.
+
+# Press Maj+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+signal = pd.read_csv('data_01.csv',sep=',',header=2,nrows=4000)
+# we create vectors
+T=signal['Time(s)']# remember to call col first and then line
+
+V=signal['Volt(V)']
+V_test=np.sin(2* np.pi * 2000 * T) * V # On multiplie par une sinusoide de la freq de la porteuse pour démoduler
+plt.subplot(2,2,1)
+plt.plot(T,V)
+plt.set_title('signal d'origine')
+# plt.plot(T,V_e)
+# plt.show()
+# plt.plot(T,V,l
+
+#let's calculate fourier transform
+fft_result=np.fft.fft(V)
+fft_modul=np.fft.fft(V_test)#mettre seulement l'image de la fonction + le signal dont la freq voulue est centrée en 0
+fft_freq=np.fft.fftfreq(4000,0.00004)
+fft_mag=np.abs(fft_result) / 4000
+plt.subplot(2,2,2)
+plt.plot(fft_freq,fft_mag)
+plt.set_title("transformée de Fourier du signal d'entrée")
+plt.subplot(2,2,3)
+plt.plot(fft_freq,np.abs(fft_modul)/4000)
+plt.set_title("transformée de Fourier du signal démodulé")
+porte=np.abs(freq)<750
+## appliquer un passe bas ou juste supprimer les parties du ignal extremales
+final=fft_modul*porte
+plt.subplot(2,2,4)
+plt.plot(fft_freq,np.abs(final)/4000)
+plt.set_title("isolation du pic centrale du signal démodulé")
+plt.show()
+signal=np.fft.ifft(final)
+plt.plot(T,np.abs(signal))
+plt.set_title("signal final")
+plt.show()
